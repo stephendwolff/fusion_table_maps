@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Display Google Map with Fusion Table layer{% endblock %}
+{% block extrahead %}
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&callback=initMap">
+    </script>
+    <!-- CSRF protection assistance-->
+    <script src="{% static 'js/csrf.js' %}"></script>
+    <!-- Main application code -->
+    <script src="{% static 'js/map_lib.js' %}"></script>
+    <script type="text/javascript">
+        {% if not google_fusion_table %}
+            alert("Cannot create a Google Fusion Table, have you saved your google API credentials JSON to 'google_api_application.json'");
+        {% else %}
+
+            // set up (template) variables used in the map_lib.js
+            var google_fusion_table_id = "{{ google_fusion_table }}";
+            var save_map_location_url = "{% url 'save-map-location' %}";
+            var google_api_key = "{{ GOOGLE_API_KEY }}";
+            var map_click_submit_in_progress = false;
+            var layer;
+
+            $(function() {
+                // reload the table and add markers once document has finished loading
+                reload_fusion_table_and_map_markers();
+
+
+                $('#clear_fusion_table').on('click', function(e) {
+                    var clear_table_url = '{% url 'clear-fusion-table' %}';
+
+                    e.preventDefault();
+
+                    $.ajax({
+                        url: clear_table_url,
+                        method: 'GET',
+                        success: function () {
+                            reload_fusion_table_and_map_markers();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            alert ("Problem clearing table: " + textStatus);
+                        }
+                    });
+                });
+            });
+        {% endif %}
+    </script>
+
+    <style>
+        /* full width map */
+	    #map-canvas {
+            height: 500px;
+            width: 100%;
+            border:0;
+            margin:0;
+            padding:0;
+    	}
+    #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 85%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px 10px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 20px;
+      }
+    </style>
+{% endblock %}
+
+{% block content %}{% csrf_token %}
+    <div id="map-canvas"></div>
+    <div id="floating-panel">
+      <a id="clear_fusion_table" href="#">Clear fusion table</a>
+    </div>
+    <div id="map-table"></div>
+{% endblock %}

@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# local specifics
+google_api_application.json
+google_api_key.txt
+db.sqlite3
+.ve/
+.ve3/
+notes.md
