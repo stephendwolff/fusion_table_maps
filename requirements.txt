@@ -1,4 +1,4 @@
 django>=1.9a01,<1.10a1
 google-api-python-client==1.6.4
 Unipath==1.1
-requests==2.18.4
+requests==2.20.0
